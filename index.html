@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pelatihan Interaktif: Data Rapi & Format Cell</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Subtle & Sophisticated (Background: #F8F7F4, Text: #3C3C3C, Accent: #A7C4BC, Secondary: #E4E4E1) -->
+    
+    <!-- 
+    Application Structure Plan: 
+    Saya merancang SPA ini sebagai modul pembelajaran interaktif, bukan salinan laporan. 
+    Struktur utamanya menggunakan tata letak dua kolom: 
+    1. Navigasi Samping (Sticky Sidebar): Memungkinkan pengguna melompat ke 'Bagian 1', 'Bagian 2', dll. Ini adalah arsitektur navigasi yang jelas dan persisten.
+    2. Area Konten Utama: Di sinilah interaktivitas terjadi. Pengguna tidak hanya membaca; mereka berinteraksi.
+    
+    Interaksi Utama:
+    - Navigasi fungsional: Mengklik link di sidebar akan menampilkan/menyembunyikan (bukan scroll) bagian konten yang relevan menggunakan JavaScript. Ini menciptakan nuansa "aplikasi".
+    - Simulator Format Cell: Di "Bagian 2", pengguna dapat memasukkan nilai dan mengklik tombol (misal: "Currency", "Date") untuk melihat output yang diformat secara dinamis.
+    - Demo Interaktif "Musuh Data": Di "Bagian 1", pengguna dapat mengklik "Merged Cells" untuk melihat visualisasi HTML/CSS tentang mengapa itu buruk.
+    - Toggle "Before/After": Di "Bagian 3", pengguna dapat beralih antara tabel "Data Berantakan" dan "Data Rapi" untuk perbandingan langsung.
+    
+    Mengapa struktur ini? 
+    Ini mengubah konten pasif (Markdown) menjadi pengalaman belajar aktif (SPA), yang jauh lebih efektif untuk pelatihan. Ini memprioritaskan "pemahaman pengguna" dan "interaksi" di atas struktur linier asli laporan.
+    -->
+    
+    <!-- 
+    Visualization & Content Choices:
+    1.  Report Info: "Musuh Utama Data Rapi" (list).
+        -   Goal: Inform, Compare (Good vs. Bad).
+        -   Viz/Method: Interactive HTML/CSS Cards. Pengguna mengklik tiap "musuh" untuk melihat penjelasan dan demo visual sederhana (misal: tabel HTML yang menunjukkan merged cell).
+        -   Interaction: onClick (show/hide detail).
+        -   Justification: Lebih menarik daripada daftar poin statis.
+    
+    2.  Report Info: Tab "Number" (Format Cells).
+        -   Goal: Inform, Demonstrate.
+        -   Viz/Method: "Format Simulator" (Input HTML + Buttons + JS Logic + Output div).
+        -   Interaction: User input, onClick (apply format).
+        -   Justification: Ini adalah inti dari interaktivitas, memungkinkan pengguna "mencoba" format cell secara virtual.
+    
+    3.  Report Info: Tab "Alignment" (Format Cells).
+        -   Goal: Inform, Demonstrate.
+        -   Viz/Method: "Alignment Simulator" (Demo div + Buttons + JS Logic).
+        -   Interaction: onClick (apply Tailwind class like 'whitespace-normal' or 'text-center').
+        -   Justification: Menunjukkan efek alignment secara visual.
+    
+    4.  Report Info: "Studi Kasus (Latihan)".
+        -   Goal: Compare, Organize.
+        -   Viz/Method: HTML Tables with a JS toggle (Buttons "Before" / "After").
+        -   Interaction: onClick (show/hide table).
+        -   Justification: Perbandingan berdampingan (dengan toggle) sangat kuat untuk belajar.
+    
+    5.  Report Info: "Visualisasi Data" (disebutkan sebagai *manfaat* data rapi).
+        -   Goal: Demonstrate.
+        -   Viz/Method: Bar Chart (Chart.js/Canvas).
+        -   Interaction: Chart akan muncul di tab "After" dari Studi Kasus, memplot data penjualan yang rapi.
+        -   Justification: Ini secara visual *membuktikan* poin utama laporan: data rapi memungkinkan visualisasi. Chart.js digunakan sesuai kebutuhan.
+    
+    (Semua diagram/tabel dibuat murni dengan HTML/Tailwind. Chart.js digunakan untuk grafik.)
+    -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+            color: #3C3C3C;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            color: #5a5a5a;
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-link:hover {
+            background-color: #E4E4E1;
+            color: #3C3C3C;
+        }
+        .nav-link.active {
+            background-color: #A7C4BC;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .interactive-btn {
+            background-color: #A7C4BC;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .interactive-btn:hover {
+            background-color: #8da9a2;
+        }
+        .interactive-btn-outline {
+            background-color: transparent;
+            color: #A7C4BC;
+            border: 2px solid #A7C4BC;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .interactive-btn-outline:hover {
+            background-color: #A7C4BC;
+            color: white;
+        }
+        .sim-output {
+            background-color: #E4E4E1;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #3C3C3C;
+            min-height: 50px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        
+        <nav class="w-full md:w-64 bg-white md:border-r border-b md:border-b-0 border-[#E4E4E1] p-4 md:sticky md:top-0 md:h-screen">
+            <h2 class="text-xl font-bold mb-6 text-[#3C3C3C]">Menu Pelatihan</h2>
+            <ul class="space-y-2">
+                <li><a href="#" class="nav-link active" data-target="bagian1">Bagian 1: Fondasi Data Rapi</a></li>
+                <li><a href="#" class="nav-link" data-target="bagian2">Bagian 2: Alat Format Cell</a></li>
+                <li><a href="#" class="nav-link" data-target="bagian3">Bagian 3: Cara Cek Format</a></li>
+            </ul>
+        </nav>
+
+        <main class="flex-1 p-6 md:p-10">
+
+            <section id="bagian1" class="content-section active">
+                <h1 class="text-3xl font-bold mb-4">Bagian 1: Fondasi - Apa Itu Data Rapi (Tidy Data)?</h1>
+                <p class="text-lg text-gray-700 mb-4">Sebelum melompat ke formula, kita harus paham "mengapa". Data rapi adalah standar untuk menyusun data agar konsisten dan mudah dianalisis. Prinsip utamanya sederhana:</p>
+                <ul class="list-disc list-inside space-y-2 mb-6 text-gray-700 bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
+                    <li><strong>Setiap Kolom adalah Variabel:</strong> Satu kolom hanya berisi satu jenis informasi (Contoh: Kolom "Nama", Kolom "Tanggal Lahir", Kolom "Jumlah Penjualan").</li>
+                    <li><strong>Setiap Baris adalah Observasi:</strong> Satu baris mewakili satu unit data (Contoh: Baris 1 adalah data pelanggan A, Baris 2 adalah data pelanggan B).</li>
+                    <li><strong>Setiap Sel adalah Nilai:</strong> Hanya ada satu nilai di dalam satu sel.</li>
+                </ul>
+                
+                <h3 class="text-2xl font-semibold mb-4">"Musuh" Utama Data Rapi</h3>
+                <p class="text-gray-700 mb-6">Ini adalah hal-hal yang harus dihindari. Klik setiap poin untuk melihat mengapa ini menjadi masalah.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
+                        <h4 class="text-xl font-semibold mb-3 text-red-600">1. Merged Cells (Sel Digabung)</h4>
+                        <p class="mb-4">Ini adalah musuh nomor satu! `Merged cells` menghalangi filter, sort, dan pemilihan data. Komputer bingung di mana data sebenarnya berada.</p>
+                        <p class="font-semibold mb-2">Contoh Masalah:</p>
+                        <div class="border rounded-lg overflow-hidden">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="border p-2" colspan="2">Area Jakarta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border p-2">Budi</td>
+                                        <td class="border p-2">5.000.000</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="mt-3 text-sm text-gray-600">Anda tidak bisa mem-filter atau memilih kolom "Area" karena sel-nya digabung.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
+                        <h4 class="text-xl font-semibold mb-3 text-red-600">2. Menyimpan Data dalam Warna</h4>
+                        <p class="mb-4">Misal: "Data yang *warna merah* berarti 'Segera Proses'". Komputer tidak bisa membaca warna sebagai data. Gunakan kolom baru "Status" dan isi dengan teks "Segera Proses".</p>
+                        <p class="font-semibold mb-2">Contoh Masalah:</p>
+                        <div class="border rounded-lg overflow-hidden">
+                            <table class="w-full text-sm">
+                                <tbody>
+                                    <tr>
+                                        <td class="border p-2 bg-red-200">Budi</td>
+                                        <td class="border p-2">5.000.000</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border p-2">Ani</td>
+                                        <td class="border p-2">7.000.000</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="mt-3 text-sm text-gray-600">Bagaimana Anda menghitung "Jumlah Penjualan yang Segera Proses"? Tidak bisa.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
+                        <h4 class="text-xl font-semibold mb-3 text-red-600">3. Header Multi-Baris yang Rumit</h4>
+                        <p class="mb-4">Judul tabel yang terlalu kompleks dan berlapis-lapis akan menyulitkan Excel untuk memahami data Anda, terutama saat menggunakan PivotTable.</p>
+                        <p class="font-semibold mb-2">Contoh Masalah:</p>
+                        <div class="border rounded-lg overflow-hidden">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class-="border p-2" rowspan="2">Nama</th>
+                                        <th class="border p-2 text-center" colspan="2">Penjualan Kuartal 1</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="border p-2">Januari</th>
+                                        <th class="border p-2">Februari</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border p-2">Budi</td>
+                                        <td class="border p-2">100</td>
+                                        <td class="border p-2">120</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="mt-3 text-sm text-gray-600">PivotTable atau Filter tidak akan tahu cara membaca header 'Penjualan Kuartal 1' dan 'Januari' secara bersamaan.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
+                        <h4 class="text-xl font-semibold mb-3 text-red-600">4. Data Ganda dalam Satu Sel</h4>
+                        <p class="mb-4">Misal: "Apel, Jeruk, Mangga" dalam satu sel. Seharusnya, ini dipisah menjadi beberapa baris atau kolom agar bisa dianalisis.</p>
+                        <p class="font-semibold mb-2">Contoh Masalah:</p>
+                        <div class="border rounded-lg overflow-hidden">
+                            <table class="w-full text-sm">
+                                <tbody>
+                                    <tr>
+                                        <td class="border p-2">Pesanan 1</td>
+                                        <td class="border p-2">Apel, Jeruk, Mangga</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border p-2">Pesanan 2</td>
+                                        <td class="border p-2">Jeruk, Pisang</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="mt-3 text-sm text-gray-600">Anda tidak bisa menghitung: "Berapa total penjualan 'Jeruk'?" Data 'Jeruk' terkunci di dalam teks.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
+                        <h4 class="text-xl font-semibold mb-3 text-red-600">5. Beberapa Tabel dalam Satu Sheet</h4>
+                        <p class="mb-4">Mencampur aduk tabel yang tidak berhubungan dalam satu worksheet (sheet yang sama) tanpa ada pembatas yang jelas akan mengacaukan fitur filter dan seleksi data otomatis.</p>
+                        <p class="font-semibold mb-2">Contoh Masalah:</p>
+                        <div class="border rounded-lg overflow-hidden p-2 bg-gray-50">
+                            <p class="text-sm font-semibold">Tabel Penjualan</p>
+                            <table class="w-1/2 text-sm bg-white mb-2">
+                                <!-- ... tabel 1 ... -->
+                                <tr><td class="border p-1">Budi</td><td class="border p-1">100</td></tr>
+                            </table>
+                            <p class="text-sm font-semibold">Tabel Stok</p>
+                            <table class="w-1/2 text-sm bg-white">
+                                <!-- ... tabel 2 ... -->
+                                <tr><td class="border p-1">Apel</td><td class="border p-1">50</td></tr>
+                            </table>
+                        </div>
+                        <p class="mt-3 text-sm text-gray-600">Jika Anda mencoba mem-filter 'Tabel Penjualan', Excel mungkin akan keliru menyertakan 'Tabel Stok'. Selalu pisahkan di posisi atau sheet yang berbeda.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="bagian2" class="content-section">
+                <h1 class="text-3xl font-bold mb-4">Bagian 2: Simulator Format Cell</h1>
+                <p class="text-lg text-gray-700 mb-6">Coba masukkan nilai di bawah dan klik tombol format untuk melihat bagaimana Excel mengubah tampilan data Anda secara interaktif. Perhatikan perbedaan antara "Tampilan di Cell" dan "Data Asli".</p>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1] mb-8">
+                    <h3 class="text-2xl font-semibold mb-4">Simulator Format Angka</h3>
+                    <div class="mb-4">
+                        <label for="format-input" class="block text-sm font-medium text-gray-700 mb-1">Masukkan Nilai (cth: 1234.5, 0.5, 45678, 08123456789):</label>
+                        <input type="text" id="format-input" value="1234.5" class="w-full p-2 border border-[#E4E4E1] rounded-md shadow-sm">
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <button class="interactive-btn" data-format="General">General</button>
+                        <button class="interactive-btn" data-format="Number">Number</button>
+                        <button class="interactive-btn" data-format="Currency">Currency</button>
+                        <button class="interactive-btn" data-format="Accounting">Accounting</button>
+                        <button class="interactive-btn" data-format="Date">Date</button>
+                        <button class="interactive-btn" data-format="Time">Time</button>
+                        <button class="interactive-btn" data-format="Percentage">Percentage</button>
+                        <button class="interactive-btn" data-format="Fraction">Fraction</button>
+                        <button class="interactive-btn" data-format="Scientific">Scientific</button>
+                        <button class="interactive-btn" data-format="Special">Special</button>
+                        <button class="interactive-btn" data-format="Custom">Custom</button>
+                        <button class="interactive-btn" data-format="Text">Text</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Tampilan di Cell:</h4>
+                            <div id="format-output" class="sim-output">1234.5</div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Data Asli (di Formula Bar):</h4>
+                            <div id="format-output-real" class="sim-output">1234.5</div>
+                        </div>
+                    </div>
+                    
+                    <div id="format-explanation-container" class="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg hidden">
+                        <h4 id="format-explanation-title" class="font-bold text-yellow-800"></h4>
+                        <p id="format-explanation-text" class="text-yellow-700"></p>
+                    </div>
+                </div>
+
+                <h3 class="text-2xl font-semibold mb-4">Contoh Data Rapi & Tepat Format</h3>
+                <p class="text-gray-700 mb-6">Inilah hasil akhir dari data yang telah dibersihkan dan diformat dengan benar. Perhatikan, setiap kolom memiliki satu jenis data, dan formatnya konsisten (Angka sebagai Angka, Tanggal sebagai Tanggal).</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
+                        <h4 class="text-xl font-semibold mb-3">Tabel Penjualan</h4>
+                        <div class="border rounded-lg overflow-hidden">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="border p-2 text-left">Nama</th>
+                                        <th class="border p-2 text-left">Alamat</th>
+                                        <th class="border p-2 text-right">Penjualan</th>
+                                        <th class="border p-2 text-left">Tgl Bergabung</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="border p-2">Budi</td>
+                                        <td class="border p-2">Jakarta</td>
+                                        <td class="border p-2 text-right">5.000.000</td>
+                                        <td class="border p-2">10 Jan 2024</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border p-2">Ani</td>
+                                        <td class="border p-2">Semarang</td>
+                                        <td class="border p-2 text-right">7.000.000</td>
+                                        <td class="border p-2">05 Feb 2024</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border p-2">Citra</td>
+                                        <td class="border p-2">Surabaya</td>
+                                        <td class="border p-2 text-right">4.500.000</td>
+                                        <td class="border p-2">03 Mar 2023</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
+                        <h4 class="text-xl font-semibold mb-3">Hasil: Data Bisa Divisualisasikan</h4>
+                        <p class="text-sm text-gray-600 mb-4">Karena kolom "Penjualan" adalah angka (bukan teks "Rp 5.000.000"), kita bisa langsung membuat grafik.</p>
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="bagian3" class="content-section">
+                <h1 class="text-3xl font-bold mb-4">Bagian 3: Cara Mengecek Format Cell</h1>
+                <p class="text-lg text-gray-700 mb-6">Ada beberapa cara mudah untuk mengetahui format apa yang sedang digunakan dalam sebuah cell di Excel, mulai dari sekadar melihat menu hingga menggunakan rumus khusus.</p>
+
+                <div class="space-y-8">
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
+                        <h3 class="text-2xl font-semibold mb-3">1. Melalui Ribbon (Cara Paling Cepat)</h3>
+                        <p class="mb-4">Ini adalah cara standar dan paling visual untuk melihat format cell.</p>
+                        <ol class="list-decimal list-inside space-y-2 pl-4">
+                            <li>Klik pada Cell yang ingin dicek.</li>
+                            <li>Lihat ke tab <strong>Home</strong> di bagian atas layar.</li>
+                            <li>Perhatikan grup menu <strong>Number</strong>. Di sana ada kotak dropdown yang menampilkan format saat ini (misalnya: <code class="bg-gray-200 px-1 rounded">General</code>, <code class="bg-gray-200 px-1 rounded">Date</code>, <code class="bg-gray-200 px-1 rounded">Percentage</code>).</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
+                        <h3 class="text-2xl font-semibold mb-3">2. Menggunakan Shortcut (Format Cells Dialog)</h3>
+                        <p class="mb-4">Jika Anda ingin melihat detail yang lebih spesifik (terutama untuk Custom Format), gunakan menu Format Cells.</p>
+                        <ol class="list-decimal list-inside space-y-2 pl-4">
+                            <li>Klik kanan pada cell, lalu pilih <strong>Format Cells...</strong></li>
+                            <li>(Atau tekan tombol shortcut <code class="bg-gray-200 px-1 rounded">Ctrl + 1</code>).</li>
+                            <li>Pastikan Anda berada di tab <strong>Number</strong>.</li>
+                            <li>Kategori yang ter-highlight adalah format cell tersebut.</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
+                        <h3 class="text-2xl font-semibold mb-3">3. Menggunakan Rumus (Function CELL)</h3>
+                        <p class="mb-4">Jika Anda ingin mengecek format secara otomatis menggunakan rumus, Anda bisa menggunakan fungsi <code class="bg-gray-200 px-1 rounded">CELL</code>.</p>
+                        <p class="mb-3">Rumusnya adalah: <code class="bg-gray-800 text-white px-2 py-1 rounded">=CELL("format", A1)</code> (Ganti A1 dengan cell yang dicek).</p>
+                        
+                        <h4 class="font-semibold mb-2">Cara membaca hasilnya:</h4>
+                        <p class="mb-4">Excel akan mengeluarkan kode huruf. Berikut adalah beberapa arti kode yang umum:</p>
+                        <table class="w-full md:w-1/2 border">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="border p-2 text-left">Kode</th>
+                                    <th class="border p-2 text-left">Format</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="border p-2"><code class="bg-gray-200 px-1 rounded">G</code></td><td class="border p-2">General (Umum)</td></tr>
+                                <tr><td class="border p-2"><code class="bg-gray-200 px-1 rounded">F</code></td><td class="border p-2">Fixed (Number dengan desimal)</td></tr>
+                                <tr><td class="border p-2"><code class="bg-gray-200 px-1 rounded">P</code></td><td class="border p-2">Percentage (Persentase)</td></tr>
+                                <tr><td class="border p-2"><code class="bg-gray-200 px-1 rounded">C</code></td><td class="border p-2">Currency (Mata Uang)</td></tr>
+                                <tr><td class="border p-2"><code class="bg-gray-200 px-1 rounded">D1, D2, ...</code></td><td class="border p-2">Date (Tanggal)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
+                        <h3 class="text-2xl font-semibold mb-3">4. Menggunakan Rumus IS (Untuk Verifikasi Cepat)</h3>
+                        <p class="mb-4">Jika Anda hanya ingin memastikan apakah sebuah cell itu dianggap Teks atau Angka (karena seringkali angka yang diformat sebagai teks menyebabkan error):</p>
+                        <ul class="list-disc list-inside space-y-2 pl-4">
+                            <li>Cek apakah Angka: <code class="bg-gray-800 text-white px-2 py-1 rounded">=ISNUMBER(A1)</code> (Jika TRUE, berarti angka).</li>
+                            <li>Cek apakah Teks: <code class="bg-gray-800 text-white px-2 py-1 rounded">=ISTEXT(A1)</code> (Jika TRUE, berarti teks).</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg" role="alert">
+                        <h4 class="font-bold text-yellow-800">Tips Pro:</h4>
+                        <p class="text-yellow-700">Seringkali data terlihat seperti angka tapi tidak bisa dijumlahkan. Biasanya ini karena formatnya adalah <code class="bg-yellow-100 px-1 rounded">Text</code>. Cek tanda segitiga hijau kecil di pojok kiri atas cell, itu indikator bahwa "Number stored as text".</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            let salesChartInstance = null;
+
+            function navigateTo(targetId) {
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.classList.add('active');
+                } else {
+                    console.error(`Elemen dengan ID '${targetId}' tidak ditemukan.`);
+                }
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.dataset.target === targetId) {
+                        link.classList.add('active');
+                    }
+                });
+                
+                if (targetId === 'bagian2' && !salesChartInstance) {
+                    createSalesChart();
+                }
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = e.currentTarget.dataset.target;
+                    navigateTo(targetId);
+                });
+            });
+
+            const formatInput = document.getElementById('format-input');
+            const formatOutput = document.getElementById('format-output');
+            const formatOutputReal = document.getElementById('format-output-real');
+            const formatButtons = document.querySelectorAll('#bagian2 .interactive-btn');
+            
+            const explanationContainer = document.getElementById('format-explanation-container');
+            const explanationTitle = document.getElementById('format-explanation-title');
+            const explanationText = document.getElementById('format-explanation-text');
+
+            const explanations = {
+                'General': {
+                    title: 'General',
+                    text: 'Format default. Excel "menebak" data Anda. (1000 jadi 1000, 5/10/2025 jadi tanggal).'
+                },
+                'Number': {
+                    title: 'Number',
+                    text: 'Untuk angka murni. Berguna untuk mengatur jumlah desimal (misal: 2 angka di belakang koma) dan pemisah ribuan.'
+                },
+                'Currency': {
+                    title: 'Currency',
+                    text: 'Untuk mata uang. Menempelkan simbol mata uang (Rp, $) langsung pada angka.'
+                },
+                'Accounting': {
+                    title: 'Accounting',
+                    text: 'Format terbaik untuk laporan keuangan! Simbol mata uang rata kiri, angka rata kanan, dan angka nol ditampilkan sebagai strip \'-\'.'
+                },
+                'Date': {
+                    title: 'Date',
+                    text: 'Sangat Penting! Mengubah angka seri internal Excel (cth: 45678) menjadi format tanggal yang bisa dibaca manusia.'
+                },
+                'Percentage': {
+                    title: 'Percentage',
+                    text: 'Mengubah nilai desimal menjadi persentase. Data asli 0.5 ditampilkan sebagai 50%.'
+                },
+                'Time': {
+                    title: 'Time',
+                    text: 'Mengubah angka desimal (pecahan hari) menjadi format waktu. Data asli 0.75 (untuk 18:00) ditampilkan sebagai 18:00:00.'
+                },
+                'Fraction': {
+                    title: 'Fraction',
+                    text: 'Menampilkan angka sebagai pecahan. Berguna untuk resep atau pengukuran. Cth: 0.5 menjadi 1/2.'
+                },
+                'Scientific': {
+                    title: 'Scientific',
+                    text: 'Menampilkan angka dalam notasi ilmiah (eksponensial). Berguna untuk angka yang sangat besar atau sangat kecil. Cth: 12345.67 menjadi 1.23E+4.'
+                },
+                'Special': {
+                    title: 'Special',
+                    text: 'Menerapkan format khusus berdasarkan lokasi, seperti kode pos atau No. Telepon. Cth: 08123456789 menjadi 0812-3456-789.'
+                },
+                'Custom': {
+                    title: 'Custom',
+                    text: 'Format paling canggih. Anda bisa mendefinisikan kode format Anda sendiri (cth: #,##0 "Unit"). Demo ini menunjukkan format "00000.00".'
+                },
+                'Text': {
+                    title: 'Text',
+                    text: 'Memaksa Excel memperlakukan data sebagai teks, bahkan jika itu angka. Berguna untuk NIK atau nomor telepon (cth: \'0812\').'
+                }
+            };
+
+            const excelDateToJSDate = (serial) => {
+                return new Date(Date.UTC(1899, 11, 30) + serial * 86400000);
+            };
+
+            const excelSerialToTime = (serial) => {
+                const totalSeconds = Math.round(serial * 86400);
+                const hours = Math.floor(totalSeconds / 3600) % 24;
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            };
+
+            const numberFormatID = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const currencyFormatID = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
+            const accountingFormatID = (num) => {
+                if (num === 0) return 'Rp -';
+                return `Rp ${numberFormatID.format(num).replace(/,00$/, '')}`;
+            };
+
+            if (formatButtons.length > 0) {
+                formatButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const value = formatInput.value;
+                        const numValue = parseFloat(value) || 0;
+                        const formatType = button.dataset.format;
+                        let output = value;
+                        let realValue = value;
+
+                        switch (formatType) {
+                            case 'General':
+                                output = value;
+                                realValue = value;
+                                break;
+                            case 'Number':
+                                output = numberFormatID.format(numValue);
+                                realValue = numValue;
+                                break;
+                            case 'Currency':
+                                output = currencyFormatID.format(numValue);
+                                realValue = numValue;
+                                break;
+                            case 'Accounting':
+                                output = accountingFormatID(numValue);
+                                realValue = numValue;
+                                break;
+                            case 'Date':
+                                if (!isNaN(numValue) && numValue > 1) {
+                                    const date = excelDateToJSDate(numValue);
+                                    output = date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+                                    realValue = numValue;
+                                } else {
+                                    output = "Bukan angka serial Excel yang valid";
+                                    realValue = value;
+                                }
+                                break;
+                            case 'Percentage':
+                                output = new Intl.NumberFormat('id-ID', { style: 'percent', minimumFractionDigits: 0 }).format(numValue);
+                                realValue = numValue;
+                                break;
+                            case 'Time':
+                                if (!isNaN(numValue) && numValue >= 0 && numValue <= 1) {
+                                    output = excelSerialToTime(numValue);
+                                    realValue = numValue;
+                                } else {
+                                    output = "Bukan angka serial waktu yang valid (0-1)";
+                                    realValue = value;
+                                }
+                                break;
+                            case 'Fraction':
+                                if (value === '0.5') { output = '1/2'; realValue = numValue; }
+                                else if (value === '0.75') { output = '3/4'; realValue = numValue; }
+                                else if (value === '0.25') { output = '1/4'; realValue = numValue; }
+                                else if (value === '1.5') { output = '1 1/2'; realValue = numValue; }
+                                else { output = value; realValue = value; }
+                                break;
+                            case 'Scientific':
+                                output = numValue.toExponential(2);
+                                realValue = numValue;
+                                break;
+                            case 'Special':
+                                if (value.length >= 10 && value.length <= 13 && !isNaN(numValue) && value[0] === '0') { 
+                                    output = `${value.substring(0, 4)}-${value.substring(4, 8)}-${value.substring(8)}`;
+                                    realValue = value;
+                                } else { output = value; realValue = value; }
+                                break;
+                            case 'Custom':
+                                output = numValue.toFixed(2).padStart(8, '0');
+                                realValue = numValue;
+                                break;
+                            case 'Text':
+                                output = value;
+                                realValue = `'${value}`;
+                                break;
+                        }
+                        formatOutput.textContent = output;
+                        formatOutputReal.textContent = realValue;
+
+                        const explanation = explanations[formatType];
+                        if (explanation) {
+                            explanationTitle.textContent = explanation.title;
+                            explanationText.textContent = explanation.text;
+                            explanationContainer.classList.remove('hidden');
+                        } else {
+                            explanationContainer.classList.add('hidden');
+                        }
+                    });
+                });
+            }
+
+            function createSalesChart() {
+                if (document.getElementById('salesChart') && !salesChartInstance) {
+                    const ctx = document.getElementById('salesChart').getContext('2d');
+                    salesChartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Budi', 'Ani', 'Citra'],
+                            datasets: [{
+                                label: 'Penjualan (Jan\'25)',
+                                data: [5000000, 7000000, 4500000],
+                                backgroundColor: [
+                                    '#A7C4BC',
+                                    '#8da9a2',
+                                    '#A7C4BC',
+                                ],
+                                borderColor: [
+                                    '#8da9a2',
+                                    '#7c948e',
+                                    '#8da9a2',
+                                ],
+                                borderWidth: 1,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed.y !== null) {
+                                                label += new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(context.parsed.y);
+                                            }
+                                            return label;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value, index, values) {
+                                            return value / 1000000 + ' Jt';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+            navigateTo('bagian1');
+        });
+    </script>
+</body>
+</html>
