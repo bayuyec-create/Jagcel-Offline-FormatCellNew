@@ -10,20 +10,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Chosen Palette: Subtle & Sophisticated (Background: #F8F7F4, Text: #3C3C3C, Accent: #A7C4BC, Secondary: #E4E4E1) -->
+    <!-- Chosen Palette: Energetic Blue (Background: #F8F7F4, Text: #3C3C3C, Accent: #2563EB, Secondary: #E4E4E1) -->
     
     <!-- 
     Application Structure Plan: 
     Saya merancang SPA ini sebagai modul pembelajaran interaktif, bukan salinan laporan. 
     Struktur utamanya menggunakan tata letak dua kolom: 
     1. Navigasi Samping (Sticky Sidebar): Memungkinkan pengguna melompat ke 'Bagian 1', 'Bagian 2', dll. Ini adalah arsitektur navigasi yang jelas dan persisten.
-    2. Area Konten Utama: Di sinilah interaktivitas terjadi. Pengguna tidak hanya membaca; mereka berinteraksi.
+    2. Area Konten Utama: Di sinilah interaktivitas terjadi. Pengguna tidak only membaca; mereka berinteraksi.
     
     Interaksi Utama:
     - Navigasi fungsional: Mengklik link di sidebar akan menampilkan/menyembunyikan (bukan scroll) bagian konten yang relevan menggunakan JavaScript. Ini menciptakan nuansa "aplikasi".
     - Simulator Format Cell: Di "Bagian 2", pengguna dapat memasukkan nilai dan mengklik tombol (misal: "Currency", "Date") untuk melihat output yang diformat secara dinamis.
     - Demo Interaktif "Musuh Data": Di "Bagian 1", pengguna dapat mengklik "Merged Cells" untuk melihat visualisasi HTML/CSS tentang mengapa itu buruk.
-    - Toggle "Before/After": Di "Bagian 3", pengguna dapat beralih antara tabel "Data Berantakan" dan "Data Rapi" untuk perbandingan langsung.
+    - Progress Bar: Fitur gamifikasi baru. Bar akan terisi saat pengguna mengunjungi setiap bagian, memberikan rasa pencapaian.
     
     Mengapa struktur ini? 
     Ini mengubah konten pasif (Markdown) menjadi pengalaman belajar aktif (SPA), yang jauh lebih efektif untuk pelatihan. Ini memprioritaskan "pemahaman pengguna" dan "interaksi" di atas struktur linier asli laporan.
@@ -34,8 +34,8 @@
     1.  Report Info: "Musuh Utama Data Rapi" (list).
         -   Goal: Inform, Compare (Good vs. Bad).
         -   Viz/Method: Interactive HTML/CSS Cards. Pengguna mengklik tiap "musuh" untuk melihat penjelasan dan demo visual sederhana (misal: tabel HTML yang menunjukkan merged cell).
-        -   Interaction: onClick (show/hide detail).
-        -   Justification: Lebih menarik daripada daftar poin statis.
+        -   Interaction: onClick (show/hide detail) + Hover effect (scale).
+        -   Justification: Lebih menarik daripada daftar poin statis. Emojis ditambahkan untuk visual appeal.
     
     2.  Report Info: Tab "Number" (Format Cells).
         -   Goal: Inform, Demonstrate.
@@ -43,23 +43,11 @@
         -   Interaction: User input, onClick (apply format).
         -   Justification: Ini adalah inti dari interaktivitas, memungkinkan pengguna "mencoba" format cell secara virtual.
     
-    3.  Report Info: Tab "Alignment" (Format Cells).
-        -   Goal: Inform, Demonstrate.
-        -   Viz/Method: "Alignment Simulator" (Demo div + Buttons + JS Logic).
-        -   Interaction: onClick (apply Tailwind class like 'whitespace-normal' or 'text-center').
-        -   Justification: Menunjukkan efek alignment secara visual.
-    
-    4.  Report Info: "Studi Kasus (Latihan)".
-        -   Goal: Compare, Organize.
-        -   Viz/Method: HTML Tables with a JS toggle (Buttons "Before" / "After").
-        -   Interaction: onClick (show/hide table).
-        -   Justification: Perbandingan berdampingan (dengan toggle) sangat kuat untuk belajar.
-    
-    5.  Report Info: "Visualisasi Data" (disebutkan sebagai *manfaat* data rapi).
+    3.  Report Info: "Visualisasi Data" (disebutkan sebagai *manfaat* data rapi).
         -   Goal: Demonstrate.
         -   Viz/Method: Bar Chart (Chart.js/Canvas).
-        -   Interaction: Chart akan muncul di tab "After" dari Studi Kasus, memplot data penjualan yang rapi.
-        -   Justification: Ini secara visual *membuktikan* poin utama laporan: data rapi memungkinkan visualisasi. Chart.js digunakan sesuai kebutuhan.
+        -   Interaction: Chart akan muncul, memplot data penjualan yang rapi dengan skema warna biru baru.
+        -   Justification: Ini secara visual *membuktikan* poin utama laporan: data rapi memungkinkan visualisasi.
     
     (Semua diagram/tabel dibuat murni dengan HTML/Tailwind. Chart.js digunakan untuk grafik.)
     -->
@@ -99,7 +87,7 @@
             color: #3C3C3C;
         }
         .nav-link.active {
-            background-color: #A7C4BC;
+            background-color: #2563EB; /* Biru cerah */
             color: #FFFFFF;
             font-weight: 600;
         }
@@ -110,27 +98,30 @@
             display: block;
         }
         .interactive-btn {
-            background-color: #A7C4BC;
+            background-color: #2563EB;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
             font-weight: 500;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .interactive-btn:hover {
-            background-color: #8da9a2;
+            background-color: #1D4ED8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .interactive-btn-outline {
             background-color: transparent;
-            color: #A7C4BC;
-            border: 2px solid #A7C4BC;
+            color: #2563EB;
+            border: 2px solid #2563EB;
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
             font-weight: 500;
             transition: all 0.2s;
         }
         .interactive-btn-outline:hover {
-            background-color: #A7C4BC;
+            background-color: #2563EB;
             color: white;
         }
         .sim-output {
@@ -142,6 +133,20 @@
             color: #3C3C3C;
             min-height: 50px;
         }
+        .progress-bar-container {
+            background-color: #E4E4E1;
+        }
+        .progress-bar {
+            background-color: #2563EB;
+            transition: width 0.5s ease-in-out;
+        }
+        .card-hover {
+            transition: all 0.2s ease-in-out;
+        }
+        .card-hover:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -149,19 +154,27 @@
     <div class="flex flex-col md:flex-row min-h-screen">
         
         <nav class="w-full md:w-64 bg-white md:border-r border-b md:border-b-0 border-[#E4E4E1] p-4 md:sticky md:top-0 md:h-screen">
-            <h2 class="text-xl font-bold mb-6 text-[#3C3C3C]">Menu Pelatihan</h2>
+            <h2 class="text-xl font-bold mb-4 text-[#3C3C3C]">Menu Pelatihan</h2>
+            
+            <div class="mb-6">
+                <p class="text-sm font-medium text-gray-700 mb-1">Progress Pelatihan</p>
+                <div class="progress-bar-container bg-gray-200 rounded-full h-2.5">
+                    <div id="progressBar" class="progress-bar h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+
             <ul class="space-y-2">
-                <li><a href="#" class="nav-link active" data-target="bagian1">Bagian 1: Fondasi Data Rapi</a></li>
-                <li><a href="#" class="nav-link" data-target="bagian2">Bagian 2: Alat Format Cell</a></li>
-                <li><a href="#" class="nav-link" data-target="bagian3">Bagian 3: Cara Cek Format</a></li>
+                <li><a href="#" class="nav-link active" data-target="bagian1">🏗️ Bagian 1: Fondasi Data Rapi</a></li>
+                <li><a href="#" class="nav-link" data-target="bagian2">🎨 Bagian 2: Alat Format Cell</a></li>
+                <li><a href="#" class="nav-link" data-target="bagian3">🔍 Bagian 3: Cara Cek Format</a></li>
             </ul>
         </nav>
 
         <main class="flex-1 p-6 md:p-10">
 
             <section id="bagian1" class="content-section active">
-                <h1 class="text-3xl font-bold mb-4">Bagian 1: Fondasi - Apa Itu Data Rapi (Tidy Data)?</h1>
-                <p class="text-lg text-gray-700 mb-4">Sebelum melompat ke formula, kita harus paham "mengapa". Data rapi adalah standar untuk menyusun data agar konsisten dan mudah dianalisis. Prinsip utamanya sederhana:</p>
+                <h1 class="text-3xl font-bold mb-4">🏗️ Bagian 1: Fondasi - Apa Itu Data Rapi (Tidy Data)?</h1>
+                <p class="text-lg text-gray-700 mb-4">Sebelum melompat ke formula, kita harus paham "Apa" & "Mengapa". Data rapi adalah standar untuk menyusun data agar konsisten dan mudah dianalisis. Prinsip utamanya sederhana:</p>
                 <ul class="list-disc list-inside space-y-2 mb-6 text-gray-700 bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
                     <li><strong>Setiap Kolom adalah Variabel:</strong> Satu kolom hanya berisi satu jenis informasi (Contoh: Kolom "Nama", Kolom "Tanggal Lahir", Kolom "Jumlah Penjualan").</li>
                     <li><strong>Setiap Baris adalah Observasi:</strong> Satu baris mewakili satu unit data (Contoh: Baris 1 adalah data pelanggan A, Baris 2 adalah data pelanggan B).</li>
@@ -169,11 +182,11 @@
                 </ul>
                 
                 <h3 class="text-2xl font-semibold mb-4">"Musuh" Utama Data Rapi</h3>
-                <p class="text-gray-700 mb-6">Ini adalah hal-hal yang harus dihindari. Klik setiap poin untuk melihat mengapa ini menjadi masalah.</p>
+                <p class="text-gray-700 mb-6">Ini adalah hal-hal yang harus dihindari. Arahkan kursor ke kartu di bawah untuk melihat mengapa ini menjadi masalah.</p>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
-                        <h4 class="text-xl font-semibold mb-3 text-red-600">1. Merged Cells (Sel Digabung)</h4>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1] card-hover">
+                        <h4 class="text-xl font-semibold mb-3 text-red-600">💥 1. Merged Cells (Sel Digabung)</h4>
                         <p class="mb-4">Ini adalah musuh nomor satu! `Merged cells` menghalangi filter, sort, dan pemilihan data. Komputer bingung di mana data sebenarnya berada.</p>
                         <p class="font-semibold mb-2">Contoh Masalah:</p>
                         <div class="border rounded-lg overflow-hidden">
@@ -194,8 +207,8 @@
                         <p class="mt-3 text-sm text-gray-600">Anda tidak bisa mem-filter atau memilih kolom "Area" karena sel-nya digabung.</p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
-                        <h4 class="text-xl font-semibold mb-3 text-red-600">2. Menyimpan Data dalam Warna</h4>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1] card-hover">
+                        <h4 class="text-xl font-semibold mb-3 text-red-600">🎨 2. Menyimpan Data dalam Warna</h4>
                         <p class="mb-4">Misal: "Data yang *warna merah* berarti 'Segera Proses'". Komputer tidak bisa membaca warna sebagai data. Gunakan kolom baru "Status" dan isi dengan teks "Segera Proses".</p>
                         <p class="font-semibold mb-2">Contoh Masalah:</p>
                         <div class="border rounded-lg overflow-hidden">
@@ -215,8 +228,8 @@
                         <p class="mt-3 text-sm text-gray-600">Bagaimana Anda menghitung "Jumlah Penjualan yang Segera Proses"? Tidak bisa.</p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
-                        <h4 class="text-xl font-semibold mb-3 text-red-600">3. Header Multi-Baris yang Rumit</h4>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1] card-hover">
+                        <h4 class="text-xl font-semibold mb-3 text-red-600">🤯 3. Header Multi-Baris yang Rumit</h4>
                         <p class="mb-4">Judul tabel yang terlalu kompleks dan berlapis-lapis akan menyulitkan Excel untuk memahami data Anda, terutama saat menggunakan PivotTable.</p>
                         <p class="font-semibold mb-2">Contoh Masalah:</p>
                         <div class="border rounded-lg overflow-hidden">
@@ -243,8 +256,8 @@
                         <p class="mt-3 text-sm text-gray-600">PivotTable atau Filter tidak akan tahu cara membaca header 'Penjualan Kuartal 1' dan 'Januari' secara bersamaan.</p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
-                        <h4 class="text-xl font-semibold mb-3 text-red-600">4. Data Ganda dalam Satu Sel</h4>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1] card-hover">
+                        <h4 class="text-xl font-semibold mb-3 text-red-600">📚 4. Data Ganda dalam Satu Sel</h4>
                         <p class="mb-4">Misal: "Apel, Jeruk, Mangga" dalam satu sel. Seharusnya, ini dipisah menjadi beberapa baris atau kolom agar bisa dianalisis.</p>
                         <p class="font-semibold mb-2">Contoh Masalah:</p>
                         <div class="border rounded-lg overflow-hidden">
@@ -264,8 +277,8 @@
                         <p class="mt-3 text-sm text-gray-600">Anda tidak bisa menghitung: "Berapa total penjualan 'Jeruk'?" Data 'Jeruk' terkunci di dalam teks.</p>
                     </div>
 
-                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
-                        <h4 class="text-xl font-semibold mb-3 text-red-600">5. Beberapa Tabel dalam Satu Sheet</h4>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1] card-hover">
+                        <h4 class="text-xl font-semibold mb-3 text-red-600">📑 5. Beberapa Tabel dalam Satu Sheet</h4>
                         <p class="mb-4">Mencampur aduk tabel yang tidak berhubungan dalam satu worksheet (sheet yang sama) tanpa ada pembatas yang jelas akan mengacaukan fitur filter dan seleksi data otomatis.</p>
                         <p class="font-semibold mb-2">Contoh Masalah:</p>
                         <div class="border rounded-lg overflow-hidden p-2 bg-gray-50">
@@ -286,14 +299,14 @@
             </section>
 
             <section id="bagian2" class="content-section">
-                <h1 class="text-3xl font-bold mb-4">Bagian 2: Simulator Format Cell</h1>
+                <h1 class="text-3xl font-bold mb-4">🎨 Bagian 2: Simulator Format Cell</h1>
                 <p class="text-lg text-gray-700 mb-6">Coba masukkan nilai di bawah dan klik tombol format untuk melihat bagaimana Excel mengubah tampilan data Anda secara interaktif. Perhatikan perbedaan antara "Tampilan di Cell" dan "Data Asli".</p>
 
                 <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1] mb-8">
                     <h3 class="text-2xl font-semibold mb-4">Simulator Format Angka</h3>
                     <div class="mb-4">
                         <label for="format-input" class="block text-sm font-medium text-gray-700 mb-1">Masukkan Nilai (cth: 1234.5, 0.5, 45678, 08123456789):</label>
-                        <input type="text" id="format-input" value="1234.5" class="w-full p-2 border border-[#E4E4E1] rounded-md shadow-sm">
+                        <input type="text" id="format-input" value="1234.5" class="w-full p-2 border border-[#E4E4E1] rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div class="flex flex-wrap gap-2 mb-4">
                         <button class="interactive-btn" data-format="General">General</button>
@@ -320,9 +333,9 @@
                         </div>
                     </div>
                     
-                    <div id="format-explanation-container" class="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg hidden">
-                        <h4 id="format-explanation-title" class="font-bold text-yellow-800"></h4>
-                        <p id="format-explanation-text" class="text-yellow-700"></p>
+                    <div id="format-explanation-container" class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg hidden">
+                        <h4 id="format-explanation-title" class="font-bold text-blue-800"></h4>
+                        <p id="format-explanation-text" class="text-blue-700"></p>
                     </div>
                 </div>
 
@@ -375,13 +388,13 @@
             </section>
 
             <section id="bagian3" class="content-section">
-                <h1 class="text-3xl font-bold mb-4">Bagian 3: Cara Mengecek Format Cell</h1>
+                <h1 class="text-3xl font-bold mb-4">🔍 Bagian 3: Cara Mengecek Format Cell</h1>
                 <p class="text-lg text-gray-700 mb-6">Ada beberapa cara mudah untuk mengetahui format apa yang sedang digunakan dalam sebuah cell di Excel, mulai dari sekadar melihat menu hingga menggunakan rumus khusus.</p>
 
                 <div class="space-y-8">
                     
                     <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
-                        <h3 class="text-2xl font-semibold mb-3">1. Melalui Ribbon (Cara Paling Cepat)</h3>
+                        <h3 class="text-2xl font-semibold mb-3">🖱️ 1. Melalui Ribbon (Cara Paling Cepat)</h3>
                         <p class="mb-4">Ini adalah cara standar dan paling visual untuk melihat format cell.</p>
                         <ol class="list-decimal list-inside space-y-2 pl-4">
                             <li>Klik pada Cell yang ingin dicek.</li>
@@ -391,7 +404,7 @@
                     </div>
 
                     <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
-                        <h3 class="text-2xl font-semibold mb-3">2. Menggunakan Shortcut (Format Cells Dialog)</h3>
+                        <h3 class="text-2xl font-semibold mb-3">⌨️ 2. Menggunakan Shortcut (Format Cells Dialog)</h3>
                         <p class="mb-4">Jika Anda ingin melihat detail yang lebih spesifik (terutama untuk Custom Format), gunakan menu Format Cells.</p>
                         <ol class="list-decimal list-inside space-y-2 pl-4">
                             <li>Klik kanan pada cell, lalu pilih <strong>Format Cells...</strong></li>
@@ -402,7 +415,7 @@
                     </div>
 
                     <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
-                        <h3 class="text-2xl font-semibold mb-3">3. Menggunakan Rumus (Function CELL)</h3>
+                        <h3 class="text-2xl font-semibold mb-3">🧪 3. Menggunakan Rumus (Function CELL)</h3>
                         <p class="mb-4">Jika Anda ingin mengecek format secara otomatis menggunakan rumus, Anda bisa menggunakan fungsi <code class="bg-gray-200 px-1 rounded">CELL</code>.</p>
                         <p class="mb-3">Rumusnya adalah: <code class="bg-gray-800 text-white px-2 py-1 rounded">=CELL("format", A1)</code> (Ganti A1 dengan cell yang dicek).</p>
                         
@@ -426,7 +439,7 @@
                     </div>
 
                     <div class="bg-white p-6 rounded-lg shadow-sm border border-[#E4E4E1]">
-                        <h3 class="text-2xl font-semibold mb-3">4. Menggunakan Rumus IS (Untuk Verifikasi Cepat)</h3>
+                        <h3 class="text-2xl font-semibold mb-3">❓ 4. Menggunakan Rumus IS (Untuk Verifikasi Cepat)</h3>
                         <p class="mb-4">Jika Anda hanya ingin memastikan apakah sebuah cell itu dianggap Teks atau Angka (karena seringkali angka yang diformat sebagai teks menyebabkan error):</p>
                         <ul class="list-disc list-inside space-y-2 pl-4">
                             <li>Cek apakah Angka: <code class="bg-gray-800 text-white px-2 py-1 rounded">=ISNUMBER(A1)</code> (Jika TRUE, berarti angka).</li>
@@ -434,9 +447,9 @@
                         </ul>
                     </div>
 
-                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg" role="alert">
-                        <h4 class="font-bold text-yellow-800">Tips Pro:</h4>
-                        <p class="text-yellow-700">Seringkali data terlihat seperti angka tapi tidak bisa dijumlahkan. Biasanya ini karena formatnya adalah <code class="bg-yellow-100 px-1 rounded">Text</code>. Cek tanda segitiga hijau kecil di pojok kiri atas cell, itu indikator bahwa "Number stored as text".</p>
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg" role="alert">
+                        <h4 class="font-bold text-blue-800">Tips Pro:</h4>
+                        <p class="text-blue-700">Seringkali data terlihat seperti angka tapi tidak bisa dijumlahkan. Biasanya ini karena formatnya adalah <code class="bg-blue-100 px-1 rounded">Text</code>. Cek tanda segitiga hijau kecil di pojok kiri atas cell, itu indikator bahwa "Number stored as text".</p>
                     </div>
                 </div>
             </section>
@@ -448,7 +461,15 @@
         document.addEventListener('DOMContentLoaded', () => {
             const navLinks = document.querySelectorAll('.nav-link');
             const contentSections = document.querySelectorAll('.content-section');
+            const progressBar = document.getElementById('progressBar');
+            const visitedSections = new Set();
+            const totalSections = navLinks.length;
             let salesChartInstance = null;
+
+            function updateProgressBar() {
+                const progress = (visitedSections.size / totalSections) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
 
             function navigateTo(targetId) {
                 contentSections.forEach(section => {
@@ -468,6 +489,9 @@
                         link.classList.add('active');
                     }
                 });
+
+                visitedSections.add(targetId);
+                updateProgressBar();
                 
                 if (targetId === 'bagian2' && !salesChartInstance) {
                     createSalesChart();
@@ -662,14 +686,14 @@
                                 label: 'Penjualan (Jan\'25)',
                                 data: [5000000, 7000000, 4500000],
                                 backgroundColor: [
-                                    '#A7C4BC',
-                                    '#8da9a2',
-                                    '#A7C4BC',
+                                    '#60A5FA',
+                                    '#2563EB',
+                                    '#93C5FD',
                                 ],
                                 borderColor: [
-                                    '#8da9a2',
-                                    '#7c948e',
-                                    '#8da9a2',
+                                    '#3B82F6',
+                                    '#1D4ED8',
+                                    '#60A5FA',
                                 ],
                                 borderWidth: 1,
                                 borderRadius: 4
